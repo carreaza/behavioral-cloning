@@ -4,9 +4,9 @@ Deep learning problem using data learned from a driving simulator and a end-to-e
 MODEL:
 
 Network:
-Used 3 convolutional layers for the images of size 160x320 with a kernel size of 3x3, using dropout, and max-pooling in this order, ending with a fully connected layer of 128 nodes, with an output layer of a single neuron. It looks like this:
+Used 2 convolutional layers for the images of size 160x320 with a kernel size of 3x3, using dropout, and max-pooling in this order, ending with a fully connected layer of 128 nodes, with an output layer of a single neuron. It looks like this:
 
-input (160x320x1) -> Conv Layer(3x3 filter, 32 depth) -> relu -> Conv Layer(3x3 filter, 32 depth) -> -> Conv Layer(3x3 filter, 32 depth) -> relu -> Max-pooling (2x2) -> Dropout (25%) -> FCL (128) -> Dropout (50%) -> Output Layer (size 1).
+input (160x320x1) -> Conv Layer(3x3 filter, 32 depth) -> -> Conv Layer(3x3 filter, 32 depth) -> relu -> Max-pooling (2x2) -> Dropout (25%) -> FCL (128) -> Dropout (50%) -> Output Layer (size 1).
 
 number of epochs 8
 batch size of 100
