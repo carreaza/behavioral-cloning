@@ -12,16 +12,27 @@ from PIL import Image
 from PIL import ImageOps
 from flask import Flask, render_template
 from io import BytesIO
+import matplotlib.pyplot as plt
 
 from keras.models import model_from_json
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array
-
 
 sio = socketio.Server()
 app = Flask(__name__)
 model = None
 prev_image_array = None
 
+image_shape = (64,64)
+IMG_CH = 3
+
+###This function preprocesses the images by resizing them, and reshaping 
+###them to the appropriate shape needed by Keras 1xWxDxC
+def preprocess_image(image):
+    image = image[60:140,:,:]
+    image = cv2.resize(image,(image_shape[1],image_shape[0]),interpolation=cv2.INTER_AREA)
+    image = image.reshape(1, image_shape[0], image_shape[1], IMG_CH)
+    return image
+    
 @sio.on('telemetry')
 def telemetry(sid, data):
     # The current steering angle of the car
@@ -34,19 +45,13 @@ def telemetry(sid, data):
     imgString = data["image"]
     image = Image.open(BytesIO(base64.b64decode(imgString)))
     image_array = np.asarray(image)
-    transformed_image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2GRAY )
-    #transformed_image_array = image_array[None, :, :, :]
+    #transformed_image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2GRAY )
 
-    #transformed_image_array= cv2.cvtColor(transformed_image_array, cv2.COLOR_RGB2GRAY )
-#    transformed_image_array = cv2.imread(array_to_img(transformed_image_array),0)
-    transformed_image_array= transformed_image_array/255
-    transformed_image_array = transformed_image_array.reshape(1,160,320,1)
-    #print(transformed_image_array.shape)
     # This model currently assumes that the features of the model are just the images. Feel free to change this.
+    transformed_image_array = preprocess_image(image_array)
     steering_angle = float(model.predict(transformed_image_array, batch_size=1))
-    #steering_angle = 0
     # The driving model currently just outputs a constant throttle. Feel free to edit this.
-    throttle = 0.2
+    throttle = 0.3
     print(steering_angle, throttle)
     send_control(steering_angle, throttle)
 
